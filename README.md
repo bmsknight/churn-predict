@@ -11,5 +11,6 @@ https://www.kaggle.com/competitions/customer-churn-prediction-2020/data
 ## Approaches 
 
 The following ML Approaches are tried out to predict
+1. K- Nearest Neighbours
 
 ## Repo Structure
