@@ -12,5 +12,8 @@ https://www.kaggle.com/competitions/customer-churn-prediction-2020/data
 
 The following ML Approaches are tried out to predict
 1. K- Nearest Neighbours
+2. Logistic Regression
+3. Random Forest
+4. Neural Network
 
 ## Repo Structure
