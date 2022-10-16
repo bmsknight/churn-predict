@@ -1,18 +1,25 @@
 import pandas as pd
 from sklearn import metrics
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 import src.constants as const
 
 
 def load_dataset(path_to_file):
     dataframe = pd.read_csv(path_to_file)
-    dataframe.drop(columns=const.DROPPED_COLUMNS, inplace=True)
-    for col in const.BINARY_COLUMNS:
-        dataframe[col] = dataframe[col].map(const.BINARY_MAPPING)
+    dataframe = transform_columns(dataframe)
     X = dataframe.drop(const.TARGET_COLUMN, axis=1)
     y = dataframe[const.TARGET_COLUMN]
     return X, y
+
+
+def transform_columns(dataframe):
+    encoder = LabelEncoder()
+    for col in const.BINARY_COLUMNS:
+        dataframe[col] = dataframe[col].map(const.BINARY_MAPPING)
+    for col in const.CATEGORICAL_COLUMNS:
+        dataframe[col] = encoder.fit_transform(dataframe[col])
+    return dataframe
 
 
 class Standardizer:
@@ -53,7 +60,7 @@ class Evaluation:
 
     def print(self):
         print("Accuracy\tPrecision\tRecall\tAUC\tF1")
-        print("%.2f\t%.2f\t%.2f\t%.2f\t%.2f" % (self.accuracy, self.precision, self.recall, self.auc, self.f1_score))
+        print("%.4f\t%.4f\t%.4f\t%.4f\t%.4f" % (self.accuracy, self.precision, self.recall, self.auc, self.f1_score))
 
         print("Confusion Matrix")
         print(self.cm)

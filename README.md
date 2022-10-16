@@ -1,5 +1,5 @@
 # churn-predict
-Predict Telco Customer Churn Prediction 
+Telco Customer Churn Prediction 
 
 Assignment 1 for Data Analytics Fundamentals.
 
