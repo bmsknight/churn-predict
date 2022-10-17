@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
@@ -6,8 +7,8 @@ from torch.utils.data import Dataset
 class ChurnDataset(Dataset):
 
     def __init__(self, x, y):
-        self.x = torch.tensor(x.to_numpy(), dtype=torch.float32)
-        y = torch.tensor(y.to_numpy(), dtype=torch.float32)
+        self.x = torch.tensor(np.array(x), dtype=torch.float32)
+        y = torch.tensor(np.array(y), dtype=torch.float32)
         self.y = y.unsqueeze(-1)
         self.length = self.x.shape[0]
 
@@ -52,7 +53,6 @@ class Learner:
         self.device = device
 
     def _train_step(self, data_loader):
-        self.network.train()
         train_loss = 0
         for x, y in data_loader:
             x = x.to(self.device)
@@ -69,6 +69,7 @@ class Learner:
 
     def train(self, train_loader):
         history = {}
+        self.network.train()
         for epoch in range(self.num_epochs):
             train_loss = self._train_step(train_loader)
             print(f"Epoch: {epoch}, \t Training loss: {train_loss}")
@@ -78,6 +79,7 @@ class Learner:
 
     def predict(self, test_loader):
         full_predictions = torch.empty(0)
+        self.network.eval()
         with torch.no_grad():
             for x, y in test_loader:
                 x = x.to(self.device)
