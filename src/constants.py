@@ -1,4 +1,5 @@
 DATASET_PATH = "data/train.csv"
+TEMPORARY_MODEL_SAVE_PATH = "models/best.pth"
 
 CATEGORICAL_COLUMNS = ["state", "area_code"]
 NUMERIC_COLUMNS = ["account_length", "number_vmail_messages", "total_day_minutes", "total_day_calls",
