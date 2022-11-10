@@ -42,6 +42,10 @@ class TunableFeedForwardNN(nn.Module):
             self.activation = nn.Sigmoid()
         elif activation == "tanh":
             self.activation = nn.Tanh()
+        elif activation == "selu":
+            self.activation = nn.SELU()
+        elif activation == "elu":
+            self.activation = nn.ELU()
         else:
             raise ValueError("Unsupported activation")
         self.sigmoid = nn.Sigmoid()

@@ -9,3 +9,5 @@ NUMERIC_COLUMNS = ["account_length", "number_vmail_messages", "total_day_minutes
 BINARY_COLUMNS = ["international_plan", "voice_mail_plan", "churn"]
 BINARY_MAPPING = {"yes": 1, "no": 0}
 TARGET_COLUMN = "churn"
+
+N_EPOCHS = 500
