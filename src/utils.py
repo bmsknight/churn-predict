@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn import metrics
 from sklearn.preprocessing import StandardScaler, LabelEncoder
@@ -69,4 +70,27 @@ class Evaluation:
 def store_hpo_eval_results(trial, eval_results, prefix=""):
     attributes = eval_results.__dict__
     for key in attributes:
-        trial.set_user_attr(prefix+key, str(attributes[key]))
+        trial.set_user_attr(prefix + key, str(attributes[key]))
+
+
+def plot_history(history, trial_id, output_path):
+    epochs, losses = zip(*history.items())
+    train_loss, val_loss = zip(*[(loss["train_loss"], loss["val_loss"]) for loss in losses])
+    plt.style.use("ggplot")
+    fig = plt.figure(figsize=[16, 10])
+    title = fig.suptitle(f"Train and Val Loss plot for Trial {trial_id}")
+    title.set_fontsize(20)
+    ax = fig.add_subplot()
+    x_axis = ax.xaxis
+    y_axis = ax.yaxis
+    x_axis.set_label_text("Epoch")
+    y_axis.set_label_text("Loss (BCE)")
+
+    train_plot, = ax.plot(epochs, train_loss)
+    train_plot.set_linewidth(5)
+    test_plot, = ax.plot(epochs, val_loss)
+    test_plot.set_linewidth(5)
+
+    fig.legend(handles=[train_plot, test_plot], labels=["Train loss", "Val loss"])
+    fig.tight_layout()
+    fig.savefig(output_path + "_loss.png")

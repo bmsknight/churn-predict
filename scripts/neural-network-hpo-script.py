@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 import src.constants as const
 from src.nn_hpo_utils import TunableFeedForwardNN
 from src.nn_utils import ChurnDataset, Learner
-from src.utils import load_dataset, Evaluation, store_hpo_eval_results
+from src.utils import load_dataset, Evaluation, store_hpo_eval_results, plot_history
 
 # Fix for optuna accessing MySQLdb module which is not present
 # alternative packages are not present in compute canada
@@ -70,6 +70,8 @@ def main(config, trial_number):
     store_hpo_eval_results(trial_number, val_results, prefix="test_")
 
     # The model selection will be done based on the returned loss. We are returning the validation AUC for that
+    plot_history(history=history, trial_id=trial_number.number,
+                 output_path=const.OUTPUT_SAVE_FORMAT.format(run_id=trial_number.number))
     return val_results.auc
 
 
