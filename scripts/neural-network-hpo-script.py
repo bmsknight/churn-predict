@@ -1,9 +1,10 @@
-import pymysql
-import random
-import torch
-import time
-import optuna
 import argparse
+import random
+import time
+
+import optuna
+import pymysql
+import torch
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader
@@ -73,15 +74,16 @@ def main(config, trial_number):
 def objective(trial):
     params = dict()
     params["lr"] = trial.suggest_loguniform("lr", 1e-6, 5e-1)
-    params["batch_size"] = trial.suggest_int("batch_size", 32, 2048)
-    params["num_layers"] = trial.suggest_int("num_layers", 2, 10)
+    params["batch_size"] = trial.suggest_int("batch_size", 32, 2048, log=True)
+    # There is an already mandatory last layer
+    params["num_layers"] = trial.suggest_int("num_layers", 1, 9)
     params["num_neurons"] = []
     for l in range(params["num_layers"]):
-        neurons = trial.suggest_int("n_units_l{}".format(l), 4, 256, log=True)
+        neurons = trial.suggest_categorical("n_units_l{}".format(l), [4, 8, 16, 32, 64, 256])
         params["num_neurons"].append(neurons)
     params["activation"] = trial.suggest_categorical("activation",
                                                      ["sigmoid", "tanh", "relu", "leaky_relu", "elu", "selu"])
-    params["dropout"] = trial.suggest_float("dropout", 0, 0.5)
+    params["dropout"] = trial.suggest_float("dropout", 0, 0.5, step=0.1)
 
     print(f"Initiating Run {trial.number} with params : {trial.params}")
 
