@@ -63,7 +63,7 @@ def main(config, trial_number):
     print("Validation Results")
     val_results = Evaluation(actuals=y_val, predictions=y_val_pred)
     val_results.print()
-    store_hpo_eval_results(trial_number,val_results, prefix="val_")
+    store_hpo_eval_results(trial_number, val_results, prefix="val_")
     print("Test Results")
     test_results = Evaluation(actuals=y_test, predictions=y_test_pred)
     test_results.print()
@@ -112,6 +112,5 @@ if __name__ == "__main__":
                                 study_name=args.optuna_study_name,
                                 storage=args.optuna_db,
                                 load_if_exists=True,
-                                pruner=optuna.pruners.HyperbandPruner()
                                 )
     study.optimize(objective, n_trials=300)
