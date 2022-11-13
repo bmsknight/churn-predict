@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 import src.constants as const
 from src.nn_hpo_utils import TunableFeedForwardNN
 from src.nn_utils import ChurnDataset, Learner
-from src.utils import load_dataset, Evaluation
+from src.utils import load_dataset, Evaluation, store_hpo_eval_results
 
 # Fix for optuna accessing MySQLdb module which is not present
 # alternative packages are not present in compute canada
@@ -54,7 +54,7 @@ def main(config, trial_number):
     optimizer = torch.optim.Adam(model.parameters(), lr=config["lr"])
 
     model_trainer = Learner(model, loss_fn, optimizer, const.N_EPOCHS, device,
-                            model_save_path=const.TEMPORARY_MODEL_SAVE_PATH + trial_number)
+                            model_save_path=const.TEMPORARY_MODEL_SAVE_PATH + str(trial_number.number))
     history = model_trainer.train(train_loader, val_loader)
     model_trainer.load_best_model()
     y_val_pred = model_trainer.predict(val_loader)
@@ -63,11 +63,13 @@ def main(config, trial_number):
     print("Validation Results")
     val_results = Evaluation(actuals=y_val, predictions=y_val_pred)
     val_results.print()
+    store_hpo_eval_results(trial_number,val_results, prefix="val_")
     print("Test Results")
     test_results = Evaluation(actuals=y_test, predictions=y_test_pred)
     test_results.print()
+    store_hpo_eval_results(trial_number, val_results, prefix="test_")
 
-    # The model selection will be done based on the returned loss. We are returning the best validation AUC for that
+    # The model selection will be done based on the returned loss. We are returning the validation AUC for that
     return val_results.auc
 
 
@@ -87,7 +89,7 @@ def objective(trial):
 
     print(f"Initiating Run {trial.number} with params : {trial.params}")
 
-    loss = main(params, str(trial.number))
+    loss = main(params, trial)
     return loss
 
 

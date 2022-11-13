@@ -64,3 +64,9 @@ class Evaluation:
 
         print("Confusion Matrix")
         print(self.cm)
+
+
+def store_hpo_eval_results(trial, eval_results, prefix=""):
+    attributes = eval_results.__dict__
+    for key in attributes:
+        trial.set_user_attr(prefix+key, str(attributes[key]))
