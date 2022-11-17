@@ -12,7 +12,7 @@ from torch.utils.data import DataLoader
 import src.constants as const
 from src.nn_hpo_utils import TunableFeedForwardNN
 from src.nn_utils import ChurnDataset, Learner
-from src.utils import load_dataset, Evaluation, store_hpo_eval_results, plot_history
+from src.utils import load_dataset, Evaluation, store_hpo_eval_results, plot_history, Standardizer
 
 # Fix for optuna accessing MySQLdb module which is not present
 # alternative packages are not present in compute canada
@@ -32,8 +32,8 @@ def main(config, trial_number):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True, random_state=0)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.25, shuffle=True, random_state=0)
 
-    # scaler = Standardizer(columns_to_standardize=const.NUMERIC_COLUMNS+const.CATEGORICAL_COLUMNS)
-    scaler = MinMaxScaler()
+    scaler = Standardizer(columns_to_standardize=const.NUMERIC_COLUMNS+const.CATEGORICAL_COLUMNS)
+    # scaler = MinMaxScaler()
     scaler.fit(X_train)
     X_train = scaler.transform(X_train)
     X_val = scaler.transform(X_val)
@@ -67,7 +67,7 @@ def main(config, trial_number):
     print("Test Results")
     test_results = Evaluation(actuals=y_test, predictions=y_test_pred)
     test_results.print()
-    store_hpo_eval_results(trial_number, val_results, prefix="test_")
+    store_hpo_eval_results(trial_number, test_results, prefix="test_")
 
     # The model selection will be done based on the returned loss. We are returning the validation AUC for that
     plot_history(history=history, trial_id=trial_number.number,
@@ -98,9 +98,9 @@ def objective(trial):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--optuna-db", type=str, help="Path to the Optuna Database file",
-                        default="sqlite:///optuna.db")
+                        default="mysql://optuna:Optuna#1234@34.168.75.39:3306/OptunaDB")
     parser.add_argument("-n", "--optuna-study-name", type=str, help="Name of the optuna study",
-                        default="churn-HPO2")
+                        default="hyper_search_churn_nn_study1")
     args = parser.parse_args()
 
     # wait for some time to avoid overlapping run ids when running parallel
